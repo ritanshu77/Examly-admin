@@ -22,5 +22,6 @@ services:
       - MONGODB_URI=${MONGODB_URI}
       - MONGODB_DB_NAME=${MONGODB_DB_NAME}
       - NODE_ENV=${NODE_ENV}
+    restart: always
     ports:
       - "3001:3001"
