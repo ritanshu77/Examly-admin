@@ -93,6 +93,26 @@ const ProtectedRoute = () => {
     return <Navigate to="/login" replace />
   }
 
+  // Self-ping to keep server active
+  useEffect(() => {
+    const pingServer = async () => {
+      try {
+        await axios.get(`${API_BASE_URL}/health`);
+        console.log('Admin Panel: Server Ping Successful 🚀');
+      } catch (error) {
+        console.error('Admin Panel: Server Ping Failed ⚠️', error);
+      }
+    };
+
+    // Initial ping
+    pingServer();
+
+    // Ping every 14 seconds
+    const interval = setInterval(pingServer, 14000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="admin-layout">
       {isMobile && (
