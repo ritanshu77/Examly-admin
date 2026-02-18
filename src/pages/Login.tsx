@@ -8,11 +8,13 @@ const Login = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
     try {
       const isEmail = identifier.includes('@');
       const payload = isEmail
@@ -28,11 +30,25 @@ const Login = () => {
       const message = err.response?.data?.message || 'Login failed';
       setError(message);
       toast.error(message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="login-page">
+      {isLoading && (
+        <div className="loader-overlay">
+          <div className="loader-container">
+            <div className="loader-spinner" />
+            <div>
+              <div className="loader-text-title">Logging you in</div>
+              <div className="loader-text-subtitle">Securely verifying admin credentials...</div>
+            </div>
+            <div className="loader-pulse-dot" />
+          </div>
+        </div>
+      )}
       <div className="card login-card">
         <div className="login-header">
           <h2>Admin Login</h2>
