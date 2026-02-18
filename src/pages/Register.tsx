@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import { API_BASE_URL } from '../config';
 
 const Register = () => {
@@ -56,20 +57,25 @@ const Register = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     try {
       if (!username) {
         setError('Username is required');
+        toast.error('Username is required');
         return;
       }
       if (usernameStatus === 'taken') {
         setError('Please choose a different username');
+        toast.error('Please choose a different username');
         return;
       }
       await axios.post(`${API_BASE_URL}/admin/register`, { name, username, email, password });
-      alert('Registration successful! Please login.');
+      toast.success('Registration successful! Please login.');
       navigate('/login');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
+      const message = err.response?.data?.message || 'Registration failed';
+      setError(message);
+      toast.error(message);
     }
   };
 

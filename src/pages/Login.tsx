@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import { API_BASE_URL } from '../config';
 
 const Login = () => {
@@ -11,6 +12,7 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     try {
       const isEmail = identifier.includes('@');
       const payload = isEmail
@@ -20,9 +22,12 @@ const Login = () => {
       const res = await axios.post(`${API_BASE_URL}/admin/login`, payload);
       localStorage.setItem('admin_token', res.data.access_token);
       localStorage.setItem('admin_user', JSON.stringify(res.data.admin));
+      toast.success('Login successful');
       navigate('/');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      const message = err.response?.data?.message || 'Login failed';
+      setError(message);
+      toast.error(message);
     }
   };
 
