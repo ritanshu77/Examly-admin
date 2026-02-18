@@ -1,6 +1,7 @@
 const getApiBaseUrl = () => {
-  let url = import.meta.env.API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:3001' : '/api');
-  // Remove trailing slash if present to avoid double slashes (e.g. domain.com//api)
+  let url =
+    import.meta.env.API_BASE_URL ||
+    (import.meta.env.DEV ? 'http://localhost:3001' : 'https://mcq-project-fz38.onrender.com/api');
   if (url.endsWith('/')) {
     url = url.slice(0, -1);
   }
@@ -8,3 +9,5 @@ const getApiBaseUrl = () => {
 };
 
 export const API_BASE_URL = getApiBaseUrl();
+
+console.log('[ADMIN] API_BASE_URL =', API_BASE_URL);
