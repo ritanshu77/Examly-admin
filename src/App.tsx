@@ -13,7 +13,10 @@ import { API_BASE_URL } from './config'
 
 axios.interceptors.request.use(
   (config) => {
-    incrementLoader()
+    const url = config.url || ''
+    if (!url.includes('/health') && !url.includes('/help')) {
+      incrementLoader()
+    }
     const token = localStorage.getItem('admin_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -28,11 +31,17 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   (response) => {
-    decrementLoader()
+    const url = response.config?.url || ''
+    if (!url.includes('/health') && !url.includes('/help')) {
+      decrementLoader()
+    }
     return response
   },
   (error) => {
-    decrementLoader()
+    const url = error?.config?.url || ''
+    if (!url.includes('/health') && !url.includes('/help')) {
+      decrementLoader()
+    }
     const status = error?.response?.status;
     if (status === 401) {
       localStorage.removeItem('admin_token');
@@ -40,7 +49,7 @@ axios.interceptors.response.use(
       if (!window.location.pathname.startsWith('/admin/login')) {
         window.location.href = '/admin/login';
       }
-    } else if (!error.response) {
+    } else if (!error.response && !url.includes('/health') && !url.includes('/help')) {
       toast.error('Network error. Please check your connection.');
     }
     return Promise.reject(error);
