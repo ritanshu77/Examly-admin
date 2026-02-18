@@ -12,7 +12,6 @@ const Register = () => {
   const [error, setError] = useState('');
   const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
   const [usernameSuggestions, setUsernameSuggestions] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,7 +58,6 @@ const Register = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
     try {
       if (!username) {
         setError('Username is required');
@@ -78,25 +76,11 @@ const Register = () => {
       const message = err.response?.data?.message || 'Registration failed';
       setError(message);
       toast.error(message);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   return (
     <div className="login-page">
-      {isLoading && (
-        <div className="loader-overlay">
-          <div className="loader-container">
-            <div className="loader-spinner" />
-            <div>
-              <div className="loader-text-title">Creating admin account</div>
-              <div className="loader-text-subtitle">Saving details securely...</div>
-            </div>
-            <div className="loader-pulse-dot" />
-          </div>
-        </div>
-      )}
       <div className="card login-card" style={{ maxWidth: '460px' }}>
         <div className="login-header">
           <h2>Admin Register</h2>

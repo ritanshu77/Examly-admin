@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Link, useLocation, Navigate, Outlet, useN
 import { LayoutDashboard, MessageSquare, BookOpen, Settings, LogOut, Menu, X, Users as UsersIcon } from 'lucide-react'
 import axios from 'axios'
 import { Toaster, toast } from 'react-hot-toast'
+import { incrementLoader, decrementLoader, subscribeLoader } from './loaderBus'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Questions from './pages/Questions'
@@ -10,9 +11,9 @@ import Users from './pages/Users'
 import QuestionEditModal from './components/QuestionEditModal'
 import { API_BASE_URL } from './config'
 
-// Axios Interceptor for Auth Token
 axios.interceptors.request.use(
   (config) => {
+    incrementLoader()
     const token = localStorage.getItem('admin_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -20,13 +21,18 @@ axios.interceptors.request.use(
     return config;
   },
   (error) => {
+    decrementLoader()
     return Promise.reject(error);
   }
 );
 
 axios.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    decrementLoader()
+    return response
+  },
   (error) => {
+    decrementLoader()
     const status = error?.response?.status;
     if (status === 401) {
       localStorage.removeItem('admin_token');
@@ -34,6 +40,8 @@ axios.interceptors.response.use(
       if (!window.location.pathname.startsWith('/admin/login')) {
         window.location.href = '/admin/login';
       }
+    } else if (!error.response) {
+      toast.error('Network error. Please check your connection.');
     }
     return Promise.reject(error);
   },
@@ -479,7 +487,13 @@ const FeedbackList = () => {
 }
 
 const App = () => {
-  // Keep-alive mechanism: Hit backend /help endpoint every 15 minutes
+  const [activeRequests, setActiveRequests] = useState(0)
+
+  useEffect(() => {
+    const unsubscribe = subscribeLoader(setActiveRequests)
+    return unsubscribe
+  }, [])
+
   useEffect(() => {
     const keepAlive = () => {
       axios.get(`${API_BASE_URL}/help`)
@@ -500,6 +514,18 @@ const App = () => {
 
   return (
     <BrowserRouter basename="/admin">
+      {activeRequests > 0 && (
+        <div className="loader-overlay">
+          <div className="loader-container">
+            <div className="loader-spinner" />
+            <div>
+              <div className="loader-text-title">Processing request</div>
+              <div className="loader-text-subtitle">Please wait while we contact the server...</div>
+            </div>
+            <div className="loader-pulse-dot" />
+          </div>
+        </div>
+      )}
       <Toaster position="top-right" />
       <Routes>
         <Route path="/login" element={<Login />} />
