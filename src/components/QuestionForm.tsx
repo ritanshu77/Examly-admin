@@ -87,7 +87,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ questionId, initialData, on
   // Fetch Subjects
   const fetchSubjects = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/questions/subjects/list`);
+      const res = await axios.get(`${API_BASE_URL}/questions/subjects/all`);
       setSubjects(res.data.subjects);
     } catch (err) {
       console.error('Error fetching subjects:', err);
@@ -158,7 +158,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({ questionId, initialData, on
 
   const fetchUnits = async (subjectId: string) => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/questions/subjects/units`, { subjectId });
+      const res = await axios.get(`${API_BASE_URL}/questions/units/all/${subjectId}`);
       setUnits(res.data.units || []);
     } catch (err) {
       console.error('Error fetching units:', err);

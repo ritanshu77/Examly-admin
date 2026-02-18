@@ -24,7 +24,7 @@ const QuestionEditModal: React.FC<QuestionEditModalProps> = ({ isOpen, onClose, 
     if (isOpen) {
       const fetchSubjects = async () => {
         try {
-          const res = await axios.get(`${API_BASE_URL}/questions/subjects/list`);
+          const res = await axios.get(`${API_BASE_URL}/questions/subjects/all`);
           setSubjects(res.data.subjects);
         } catch (err) {
           console.error('Error fetching subjects:', err);
@@ -83,7 +83,7 @@ const QuestionEditModal: React.FC<QuestionEditModalProps> = ({ isOpen, onClose, 
     if (formData.subjectId) {
       const fetchUnits = async () => {
         try {
-          const res = await axios.post(`${API_BASE_URL}/questions/subjects/units`, { subjectId: formData.subjectId });
+          const res = await axios.get(`${API_BASE_URL}/questions/units/all/${formData.subjectId}`);
           setUnits(res.data.units || []);
         } catch (err) {
           console.error('Error fetching units:', err);

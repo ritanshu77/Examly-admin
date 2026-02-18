@@ -4,7 +4,7 @@ import axios from 'axios';
 import { API_BASE_URL } from '../config';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -12,7 +12,12 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${API_BASE_URL}/admin/login`, { email, password });
+      const isEmail = identifier.includes('@');
+      const payload = isEmail
+        ? { email: identifier, password }
+        : { username: identifier, password };
+
+      const res = await axios.post(`${API_BASE_URL}/admin/login`, payload);
       localStorage.setItem('admin_token', res.data.access_token);
       localStorage.setItem('admin_user', JSON.stringify(res.data.admin));
       navigate('/');
@@ -22,18 +27,21 @@ const Login = () => {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f5f6fa', padding: '15px' }}>
-      <div className="card" style={{ width: '100%', maxWidth: '400px', padding: '30px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Admin Login</h2>
+    <div className="login-page">
+      <div className="card login-card">
+        <div className="login-header">
+          <h2>Admin Login</h2>
+          <p>Login with your email or username to manage exams.</p>
+        </div>
         {error && <div className="alert alert-danger" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
         <form onSubmit={handleLogin}>
           <div className="form-group" style={{ marginBottom: '15px' }}>
-            <label>Email</label>
+            <label>Email or Username</label>
             <input
-              type="email"
+              type="text"
               className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               required
               style={{ width: '100%', padding: '10px', marginTop: '5px' }}
             />
